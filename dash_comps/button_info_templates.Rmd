@@ -1,0 +1,56 @@
+---
+title: "info_buttons_templates"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: fill
+runtime: shiny
+---
+
+
+```{r}
+
+# Show information templates used. 
+
+# Add action button and style it. 
+
+actionButton(inputId = "info_template", 
+             label = "",
+             class = "btn-xs",
+             icon = icon("info-circle", verify_fa = FALSE),
+             style = "background-color: #337ab7; 
+                      border: 2px solid #8CBBD2; 
+                      border-radius: 5px")
+
+
+# Show information about the DMP templates.
+
+observeEvent(input$info_template, {
+  
+  showModal(
+    modalDialog(title = "Information on templates",
+                easyClose = TRUE,
+                footer = NULL,
+                tags$div(
+                         tags$p(strong("DMP templates: "),
+                                "While there may be a variety of DMP templates available in,
+                                this dashboard focuses specifically on the 
+                                templates listed below:"),
+                          tags$ul(
+                                  tags$li(strong("Template 2021: "), 
+                                          "First DMP template, Data released: 
+                                          2020-01-01, Date unpublished: 2022-12-01"),
+                                  tags$li(strong("Template 2022 :"),
+                                          "Second DMP template, Data released: 
+                                          2022-12-01, Date unpublished: 2024-01-01"),
+                                  tags$li(strong("Template 2024 :"), 
+                                          "Current DMP template, Data released: 
+                                          2024-01-01"),
+                                  )
+                         )
+                )
+          )
+})
+
+```
+

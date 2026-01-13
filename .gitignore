@@ -1,0 +1,11 @@
+# renv cache and libraries (do not commit!)
+renv/library/
+renv/staging/
+# R session files
+.Rhistory
+.RData
+.Ruserdata
+# Other typical ignores
+.DS_Store
+*.Rproj.user
+.Rproj.user

@@ -1,0 +1,33 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: DMP dashboard
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Andres Felipe
+    family-names: Ramos Padilla
+    email: andres.ramos.padilla@rivm.nl
+    orcid: 'https://orcid.org/0000-0002-4561-2452'
+    affiliation: >-
+      National Institute for Public Health and the
+      Environment
+  - given-names: Danny
+    family-names: de Koning-van Nieuwamerongen
+    orcid: 'https://orcid.org/0000-0002-8264-4541'
+abstract: >-
+  The DMP Dashboard is an open source tool designed to
+  provide an overview and monitoring of Data Management
+  Plans (DMPs) within research projects and organizations.
+keywords:
+  - Data management plans
+  - DMP
+  - Dashboard
+  - Open Science
+  - Compliance
+  - Monitoring
+license: EUPL-1.2
+version: 1.0.0

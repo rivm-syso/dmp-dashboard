@@ -1,0 +1,142 @@
+---
+title: "sidebar"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: fill
+runtime: shiny
+---
+
+
+```{r}
+
+# Select Domain input dropdown selector. 
+# Choices will be the ones as presented in the domain column 
+# of the dataframe.
+
+selectInput("domain", 
+            label = 'Domain',
+            choices = c('all', levels(as.factor(dmp_data$domain))))
+
+
+# Select center input dropdown selector. 
+# Choices will be the ones as presented in the centra column 
+# of the dataframe.
+
+selectInput("centra", 
+            label = 'Center',
+            choices = c('all', levels(as.factor(dmp_data$centra))))
+
+
+# Select department input dropdown selector. 
+# Choices will be the ones as presented in the department column 
+# of the dataframe.
+
+selectInput("department", 
+            label = 'Department',
+            choices = c('all', levels(as.factor(dmp_data$department))))
+
+
+# Select Test input checkbox. 
+# When selected the output is TRUE else FALSE. This checkbox is
+# used so that the user can exclude DMPs with a status 'Test' from
+# any chart or table generation. 
+
+checkboxInput("exclude_test", "Exclude 'test' DMPs", value = TRUE)
+
+```
+
+
+<!-- ------------------------------------------------------------------------------------------------ -->
+<!-- ------------------------------------------------------------------------------------------------ -->
+<!-- ------------------------------------------------------------------------------------------------ -->
+
+
+``` {r, include = FALSE}
+
+library(dplyr)
+
+# This section updates the possible input selections based on other selections
+# made. For example, if 'domain 1' is selected, you should not be able to 
+# select centra from domain 2, eg, only centra existing in domain 1 should
+# be visible. 
+# Note that as columns are factors, you need to drop levels of factors
+# if filtering results in some factor value to not be present. R dataframes
+# retain full factor information even if a factor value is not present, you need
+# to drop levels if those factor levels are not required.
+
+# Domain input.
+# Update the possible choices for centra and department when the domain selection 
+# is 'all' or not 'all'.
+
+observeEvent(input$domain, {
+  
+  if (input$domain == "all") {
+    
+    updateSelectInput(session, "centra", choices = c('all', levels(dmp_data$centra)))
+    
+    updateSelectInput(session, "department", choices = c("all"))
+    
+  }
+  
+  
+  if (input$domain != "all") {
+    
+    domchoice <- dmp_data %>% 
+
+                 filter(.data$domain == input$domain) %>% 
+                
+                 select("centra", "department") %>% 
+                
+                 mutate(centra = as.factor(centra),
+                        department = as.factor(department)) %>% 
+                
+                 droplevels()
+
+      
+    updateSelectInput(session, "centra", choices = c('all', levels(domchoice$centra)))
+    
+    updateSelectInput(session, "department", choices = c("all", levels(domchoice$department)))
+    
+    }
+
+})
+
+
+# Centra input.
+# Update the possible choices for domain and department when the centra selection is 
+# either 'all' or not 'all'.
+
+observeEvent(input$centra, {
+  
+  if (input$centra == "all") {
+    
+    updateSelectInput(session, "department", choices = c("all"))
+    
+    }
+  
+    
+  if (input$centra != "all") {
+
+    centchoice <- dmp_data %>% 
+
+                  filter(.data$centra == input$centra) %>% 
+                    
+                  select("domain", "department") %>% 
+                    
+                  mutate(domain = as.factor(domain),
+                         department = as.factor(department)) %>% 
+                    
+                  droplevels()
+    
+    
+    updateSelectInput(session, "department", choices = c("all", levels(centchoice$department)))
+    
+    }
+
+})
+
+
+```
+
+

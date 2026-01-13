@@ -1,0 +1,72 @@
+---
+title: "filter_data"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: fill
+runtime: shiny
+---
+
+
+``` {r, include = FALSE}
+
+library(dplyr)
+library(lubridate)
+
+# This section is used to filter the data based on selection made
+# with the select input buttons.
+# Basically, filtering is only done when any of the input selection
+# button does not equal 'all'.
+
+filtered_data <- reactive({
+  
+  data_filtered <- dmp_data 
+  
+  
+  # Filter domain.
+  
+  if (input$domain != "all") {
+    
+    data_filtered <- filter(data_filtered, domain == input$domain)
+    
+  }
+  
+  
+  # Filter centra.
+  
+  if (input$centra != "all") {
+    
+    data_filtered <- filter(data_filtered, centra == input$centra)
+    
+  }
+  
+  
+  # Filter department.
+  
+  if (input$department != "all") {
+    
+    data_filtered <- filter(data_filtered, department == input$department)
+    
+  }
+  
+  
+  # Filter out 'test' status DMPs
+  # Note that if test status is filtered out, you need to exclude the 
+  # factor level 'Test', otherwise an entry is included on the x axis
+  # of the chart displaying the numbers of DMPs with various statuses.
+  
+  if (input$exclude_test) {
+    
+    data_filtered <- filter(data_filtered, status != "Test") %>% 
+      
+                     mutate(
+                           status = factor(status, exclude = 'Test'))
+    
+  }
+  
+  
+  data_filtered
+  
+})
+
+```

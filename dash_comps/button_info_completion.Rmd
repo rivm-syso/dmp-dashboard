@@ -1,0 +1,49 @@
+---
+title: "info_buttons_completion"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: fill
+runtime: shiny
+---
+
+
+```{r}
+
+# Show information about DMP completion
+
+# Add action button and style it. 
+
+actionButton(inputId = "info_completion", 
+             label = "",
+             class = "btn-xs",
+             icon = icon("info-circle", verify_fa = FALSE),
+             style = "background-color: #337ab7; 
+                      border: 2px solid #8CBBD2; 
+                      border-radius: 5px;")
+
+
+# Show information about the DMP completion.
+
+observeEvent(input$info_completion, {
+  
+  showModal(
+    modalDialog(title = "Information on completion rate",
+                easyClose = TRUE,
+                footer = NULL,
+                tags$div(
+                         tags$p(strong("DMP completion: "),
+                                "The completion percentage categories shown here 
+                                represent the proportion of questions answered 
+                                in a given DMP template. A value of 100% indicates 
+                                that all questions have been answered, while a value 
+                                in the category '< 25%' indicates that the DMP is nearly
+                                empty. Note: answering a question does 
+                                not necessarily guarantee the quality of the 
+                                response."),
+                         )
+                )
+          )
+})
+
+```

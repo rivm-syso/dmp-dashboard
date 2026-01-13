@@ -1,0 +1,56 @@
+---
+title: "info_buttons_templates"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: fill
+runtime: shiny
+---
+
+
+```{r}
+
+# Action button to clear selections made in charts.
+# This does not clear any selections made with the input selection
+# buttons.
+
+actionButton(inputId = "clear_selection",  
+             label = "Clear Graph Selection",
+             style = "background-color: #337ab7; 
+                      border: 2px solid #8CBBD2;")
+
+
+# Reactive values to track selections from each chart.
+# By default, these are NULL unless a selection is made in a chart. 
+# See the 'datatable_main.Rmd' for more info on how this is used.
+
+# Templates
+
+selected_templ <- reactiveVal(NULL)
+
+
+# Completion
+
+selected_compl <- reactiveVal(NULL)
+
+
+# Status
+
+selected_stat <- reactiveVal(NULL)
+
+
+# Observe "Clear Selection" button click to reset filters
+# to NULL.
+
+observeEvent(input$clear_selection, {
+
+  selected_templ(NULL) 
+  
+  selected_compl(NULL) 
+  
+  selected_stat(NULL) 
+
+})
+
+```
+

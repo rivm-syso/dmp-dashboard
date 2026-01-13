@@ -1,0 +1,80 @@
+---
+title: "global-setup"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: fill
+runtime: shiny
+---
+
+
+```{r setup, include = FALSE}
+
+# These are the libraries that will be loaded
+# globally. They are also specified at each code chunk
+# so that the use knows which libraries are used in each
+# chunk.
+
+library(flexdashboard)
+library(dplyr)
+library(stringr)
+library(plotly)
+library(ggplot2)
+library(lubridate)
+library(DT)
+
+```
+
+
+
+```{r global, include = FALSE}
+
+library(dplyr)
+library(lubridate)
+
+# Read data in 'global' chunk so it can be shared by all sections
+# of the code.
+# The columns that are actually categories are converted from character
+# to factors. This helps making count() and plotting a bit more 
+# straightforward.
+# Finally, the completion_fraction columns is converted to percentage
+# and then it is converted to 6 categories that are converted to 
+# factors and the factor leveling is reodered to a desired order 
+# (otherwise the order is alphabetical and makes no sense in plotting).
+# Columns not required are removed).
+
+dmp_data <- read.csv2('../dmp_data/fake_dmp_data.csv') %>% 
+  
+            mutate(., 
+                   user = as.factor(user),
+                   domain = as.factor(domain),
+                   centra = as.factor(centra),
+                   department = as.factor(department),
+                   status = as.factor(status),
+                   creation_date = as_date(ymd(creation_date)),
+                   last_update_date = as_date(ymd(last_update_date)),
+                   template = as.factor(template),
+                   completion_fraction = round(completion_fraction * 100, digits = 2),
+                   completion_temp = case_when(completion_fraction >= 0.001 & completion_fraction < 25.00
+                                                    ~ '< 25%',
+                                                    completion_fraction >= 25.00 & completion_fraction < 49.99
+                                                    ~ '25% - 50%',
+                                                    completion_fraction >= 49.99 & completion_fraction < 74.99
+                                                    ~ '50% - 75%',
+                                                    completion_fraction >= 74.99 & completion_fraction < 99.99
+                                                    ~ '75% - 99%',
+                                                    completion_fraction >= 99.99 
+                                                    ~ '100%',
+                                                    .default = '0%'),
+                   completion_cat = factor(completion_temp, 
+                                                  levels = c('0%', 
+                                                             '< 25%', 
+                                                             '25% - 50%', 
+                                                             '50% - 75%', 
+                                                             '75% - 99%', 
+                                                             '100%'))) %>% 
+  
+              select(-completion_temp, -completion_fraction)
+
+```
+

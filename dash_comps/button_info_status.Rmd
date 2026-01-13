@@ -1,0 +1,71 @@
+---
+title: "info_buttons_stats"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: fill
+runtime: shiny
+---
+
+
+```{r}
+
+# Show information on DMP status.
+
+# Add action button and style it. 
+
+actionButton(inputId = "info_status", 
+             label = "",
+             class = "btn-xs",
+             icon = icon("info-circle", verify_fa = FALSE),
+             style = "background-color: #337ab7; 
+                      border: 2px solid #8CBBD2; 
+                      border-radius: 5px;")
+
+
+# Show information about the DMP statuses
+
+observeEvent(input$info_status, {
+  
+  showModal(
+    modalDialog(title = "Information on DMP Statuses",
+                easyClose = TRUE,
+                footer = NULL,
+                tags$div(
+                         tags$p(strong("DMP statuses: "),
+                                "DMP statuses are defined by considering the project's 
+                                start and end dates, the most recent modifications made 
+                                by the owner/user, and whether the user remains affiliated 
+                                with the institute."),
+                          tags$ul(
+                                  tags$li(strong("Active: "), 
+                                          "The project is currently ongoing and has been 
+                                          updated recently."),
+                                  tags$li(strong("Completed: "),
+                                          "The project is finished, and the DMP was updated 
+                                          within six months of completion."),
+                                  tags$li(strong("Test: "), 
+                                          "The DMP is flagged as a test or resembles a test 
+                                          scenario."),
+                                  tags$li(strong("Missing Metadata: "), 
+                                          "Important data like project dates are missing."),
+                                  tags$li(strong("Not Updated: "), 
+                                          "The DMP has not received any updates in over a 
+                                          year."),
+                                  tags$li(strong("Expired: "), 
+                                          "The DMP wasn't updated within six months after 
+                                          the project finished."),
+                                  tags$li(strong("Orphan: "), 
+                                          "The project is ongoing, but the owner is no longer
+                                          an employee."),
+                                  tags$li(strong("Defunct: "), 
+                                          "The project is inactive and not managed by the 
+                                          original owner.")
+                                  )
+                         )
+                )
+          )
+})
+
+```
+

@@ -1,0 +1,51 @@
+---
+title: "download-data"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: fill
+runtime: shiny
+---
+
+
+```{r}
+
+# Adding a download button
+
+# Add a little spacing before the button render. Button will be in the 
+# sidebar and is otherwise too close to other elements. Do this by
+# adding a div element.
+
+div(
+
+  # Add the button with styling
+
+  downloadButton(outputId = "download_filtered", 
+                 label = "Download (CSV)",
+                 style = "background-color: #154273;")
+
+  
+# The next line is part of the div element.
+
+, style = "margin-top: 20px")
+
+
+# Add what the button should download with a pre-defined title including
+# today's data and time of download (Sys.time()).
+
+output$download_filtered <- downloadHandler(
+  
+  filename = function() {
+    
+    paste0("DMPDashboard_selected_", format(Sys.time(), "%Y%m%d_%H%M"), ".csv")
+    
+    },
+  
+  content = function(file) {
+    
+    write.csv(filtered_data(), file, row.names = FALSE)
+    
+    }
+  )
+
+```

@@ -1,0 +1,120 @@
+---
+title: "general_stats"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: fill
+runtime: shiny
+---
+
+
+```{r}
+ 
+library(dplyr)
+library(lubridate)
+library(DT)
+
+# This section creates the input for and renders the general 
+# statistics table included in the sidebar of the dashboard.
+ 
+# Create a reactive function to attain the general statistics. Reactive 
+# required as input changed when selection input changes. 
+
+gen_stats_table <- reactive({
+  
+  # Get number of distinct users from the filtered_data() output.
+  
+  total_users_freq <-  n_distinct(filtered_data()$user)
+  
+  
+  # Get the number of DMPs present which is equal to the number of rows of the 
+  # filtered_data() output.
+  
+  total_dmps_freq <-  nrow(filtered_data())
+  
+  
+  # Get the number of updated DMPs from the last 4 weeks by filtering the
+  # existing last_update_date column for the current date (Sys.Date()) minus 4 weeks.
+  # The resulting number of rows is then the number of updated DMPs. 
+  
+  updated_dmps_freq <- filter(filtered_data(), 
+                              last_update_date >= Sys.Date() - weeks(4)) %>% 
+  
+                       nrow()
+  
+  
+  # Get the number of new DMPs from the last 4 weeks by filtering the
+  # existing creation_date column for the current date (Sys.Date()) minus 4 weeks.
+  # The resulting number of rows is then the number of updated DMPs. 
+  
+  new_dmps_freq <- filter(filtered_data(), creation_date >= Sys.Date() - weeks(4)) %>% 
+  
+                   nrow()
+                   
+
+  # Input the output of the previous lines into a new dataframe which will be 
+  # used to render the datatable below.
+   
+  gen_stats <- data.frame(statistic = c("Users",
+                                        "Total users",
+                                        "DMPs:",
+                                        "Total DMPs",
+                                        "Updated < 4 wks",
+                                        "New < 4 wks"),
+                          N = c('',
+                                total_users_freq,
+                                '',
+                                total_dmps_freq,
+                                updated_dmps_freq,
+                                new_dmps_freq))
+  
+  })
+
+
+# Add a little spacing after the table render, by using html 'div'
+# element that uses style for margin space at the bottom of the table.
+
+div(
+
+  DT::renderDT({
+    
+    
+    # Note that DOM options will be deprecated in future versions
+    # of the DT package, check 'layout' options then.
+    # - Options:
+    #   - DOM options: f = filtering, 
+    #                  r = processing display element, 
+    #                  t = the table, 
+    #                  i = short table information, 
+    #                  p = pagination control, 
+    #                  l = controlling how many rows to show on screen.
+    #   - No ordering required.
+    #   - table is left aligned on all columns (using columnDefs).
+    # Extra formatting is done using json css style option (which is annoying and
+    # less clear, but no other way to do it consistently to only an individual object).
+    # The text size is reduced for the table body.
+    # We do not want to show row numbers and hence rownames is set to false.
+    # We do not need to display columnnames, hence columnames are set to NULL. 
+    
+    DT::datatable(gen_stats_table(), 
+                  options = list(scrollY = FALSE,
+                                 dom = "t",
+                                 ordering = FALSE,
+                                 columnDefs = list(list(className = "dt-left",
+                                                        targets = "_all")),
+                            initComplete = JS(
+                                              "function(settings, json) {
+                                                    $(this.api().table().body()).css({
+                                                          'font-size': '90%'});",
+                                              "}")),
+                 rownames = FALSE,
+                 colnames = NULL) 
+     
+  })
+
+  
+  # Next line is part of the div element.
+  
+ , style = "margin-bottom: 20px;")
+
+```

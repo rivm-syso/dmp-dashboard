@@ -1,0 +1,137 @@
+---
+title: "TITLE DMP DASHBOARD"
+runtime: shiny
+output: 
+  flexdashboard::flex_dashboard: 
+    css: www/css/custom.css
+    orientation: rows
+    vertical_layout: fill
+    source_code: embed
+    navbar:
+      - { title: "DMP information", 
+          href: "REFERENCE TO PUBLIC/INTERNAL LINK WITH MORE INFORMATION",
+          align: right}
+      - { title: "Mail us", 
+          href: "mailto:EMAIL@INSTITUTE.LAND", 
+          align: right }
+---
+
+
+```{r child = 'dash_comps/global_setup.Rmd'}
+
+# running any setup and global actions specified
+
+```
+
+
+```{r child = 'dash_comps/filter_data.Rmd'}
+
+# Running general reactive function to return a filtered dataset based on input selection.
+
+```
+
+
+Inputs {.sidebar data-width=195}
+-----------------------------------------------------------------------
+
+
+```{r picture, echo = F, out.width = '100%'}
+
+# Adding logo
+
+knitr::include_graphics("www/logo/fake_logo_dmp_flex.svg")
+
+```
+
+
+```{r child = 'dash_comps/buttons_input.Rmd'}
+
+# Adding input selection buttons
+
+```
+
+
+```{r child = 'dash_comps/datatable_general_stats.Rmd'}
+
+# Rendering datatable with general statistics.
+
+```
+
+
+```{r child = 'dash_comps/button_clear.Rmd'}
+
+# Adding a clear button to clear selections made in charts.
+
+```
+
+
+```{r child = 'dash_comps/button_download.Rmd'}
+
+# Adding download to csv button.
+
+```
+
+
+Row
+-----------------------------------------------------------------------
+
+### <!-- ### chart on DMP status -->
+
+```{r child = 'dash_comps/button_info_status.Rmd'}
+
+# Adding an info button.
+
+```
+
+
+```{r child = 'dash_comps/chart_status.Rmd'}
+
+# Rendering chart DMP status.
+
+```
+
+
+### <!-- ### chart on DMP templates -->
+
+```{r child = 'dash_comps/button_info_templates.Rmd'}
+
+# Adding an info button.
+
+```
+
+
+```{r child = 'dash_comps/chart_templates.Rmd'}
+
+# Rendering chart dmp templates.
+
+```
+
+
+### <!-- ### chart on DMP completion rates -->
+
+```{r child = 'dash_comps/button_info_completion.Rmd'}
+
+# Adding an info button.
+
+```
+
+
+```{r child = 'dash_comps/chart_completion.Rmd'}
+
+# Rendering chart dmp completion.
+
+```
+
+
+Row
+-----------------------------------------------------------------------
+
+### <!-- Full DMP dataset -->
+
+```{r child = 'dash_comps/datatable_main.Rmd'}
+
+# Rendering datatable of the DMP dataset.
+
+```
+
+

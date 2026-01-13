@@ -1,0 +1,240 @@
+---
+title: "main-data-render"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: fill
+runtime: shiny
+---
+
+
+```{r}
+
+library(dplyr)
+library(ggplot2)
+library(plotly)
+library(DT)
+
+# The end goal of this section is to have a datatable rendered that show
+# the data based on the input buttons of the sidebar and any additional
+# selections made on any of the graphs. 
+
+# In order to observe whether any selections have been made on a graph
+# and grab that input, the graphs need to be rendered first. To check
+# whether the graphs have been rendered, we use the function added
+# at each chart (plot_rendered_type()) and indicate what we want to 
+# eventually monitor from each chart. 
+
+selectout_templ <- reactive({
+
+  req(plot_rendered_templ())
+  
+  event_data("plotly_selected", source = "template_chart")
+  
+  })
+
+
+selectout_compl <- reactive({
+    
+  req(plot_rendered_compl())
+    
+  event_data("plotly_selected", source = "completion_chart")
+  
+  })
+
+
+selectout_stat <- reactive({
+    
+  req(plot_rendered_stat())
+    
+  event_data("plotly_selected", source = "status_chart")
+  
+  })
+
+
+# In the clear button section we declared various 'selected_type()' functions 
+# that have reactive values. By default that is NULL and when the clear button
+# is clicked, it will be NULL again. Here we assign the values based on any 
+# selections made in a chart. We observe the event as stated above and when
+# such an event occurs, we grab the selected datapoints and assign it to the 
+# selected_type() functions. We previously indicated that selected_type() is reactive
+# so no need for assigning operators (as in selected_type <- event_data(blabla)). 
+
+observeEvent(selectout_templ(), {
+  
+  selected_templ(event_data("plotly_selected", source = "template_chart"))
+
+})
+
+
+observeEvent(selectout_compl(), {
+  
+  selected_compl(event_data("plotly_selected", source = "completion_chart"))
+
+})
+
+
+observeEvent(selectout_stat(), {
+  
+  selected_stat(event_data("plotly_selected", source = "status_chart"))
+
+})
+
+  
+# Now that we have the values of possible selections in charts made, we
+# can filter our data based on those selection, which can eventually be used to
+# render the data table.
+
+selected_data <- reactive({
+  
+  # Assign the output of filtered() to an object for a bit easier writing
+    
+  data <- filtered_data()
+  
+  
+  # The output of event_data() is a numerical x value and y value. The y value
+  # is as expected, but the x value seems to be numerical whereas our charts
+  # display characters as factors (for example the different statuses or templates
+  # used. The numerical x value is the ordered location of those factors as plotted.
+  # If we want to filter, we need our factored data values to be ordered as well so
+  # that the location on the chart is the same for our data. For example, the status
+  # 'expired' is plotter (i.e. ordered) on the 4th spot. To filter data for any x=4,
+  # we need to make sure that the 4th factor level in our data is also status 'expired'.
+  # We do not order the completion_cat columns, as we previously assigned an order to
+  # the factor levels (when reading in the data in the global section). The plot takes
+  # this order specifically.
+
+  classes_templ <- sort(levels(filtered_data()$template))
+  
+  classes_stat <- sort(levels(filtered_data()$status))
+  
+  classes_compl <- levels(filtered_data()$completion_cat)
+  
+  
+  # Apply template filter. We assign the value of selected_templ (either NULL or the 
+  # event_data) to an object for easier writing.
+  # If the template range is not NULL (e.g. a selection in a chart has been made) and
+  # the column name 'x' occurs in template_range (remember that event_data outputs an
+  # x and y value which are columnnames), then start filtering. 
+  # The filtering is a bit complicated but essentially filters the dataset on the template
+  # column where classes (we defined earlier) is equal to the number in the x value (e.g.,
+  # x = 4 is the 4th place in the ordered list of factor levels which is the status 
+  # 'expired'). 
+  # This is the same for each filtering for 'template', 'status', and 'completion'.
+  
+  
+  # Filtering for templates.
+  
+  template_range <- selected_templ() 
+  
+  
+  if (!is.null(template_range) && "x" %in% names(template_range)) {
+  
+      data <- data %>% 
+        
+              filter(.data$template %in% classes_templ[template_range$x])
+    }
+
+  
+  # Filtering for status.
+  
+  stat_range <- selected_stat()
+  
+  
+  if (!is.null(stat_range) && "x" %in% names(stat_range)) {
+    
+    data <- data %>% 
+          
+            filter(.data$status %in% classes_stat[stat_range$x])
+  
+    }
+
+  
+  # Filtering for completion.
+  
+  compl_range <- selected_compl()
+  
+  
+  if (!is.null(compl_range) && "x" %in% names(compl_range)) {
+    
+    data <- data %>% 
+          
+            filter(.data$completion_cat %in% classes_compl[compl_range$x])
+  
+    }
+
+  
+  # Return the data object.
+  
+  return(data)
+  
+  })
+
+
+# With all selections now performed in the dashboard either through
+# the select input buttons or in chart, we can render the data table
+# based on the selection. The output of selected_data() (the lines above)
+# are rendered. 
+
+# Note that DOM options will be deprecated in future versions
+# of the DT package, check layout options then.
+# - Filter places a filter box at the top of each column.
+#   It is a plain box to reduce the size it takes up.
+# - selection = multiple to allow a user to make multiple 
+#   selections in the filter boxes.  
+# - Options:
+#   - DOM options: f = filtering, 
+#                  r = processing display element, 
+#                  t = the table, 
+#                  i = short table information, 
+#                  p = pagination control, 
+#                  l = controlling how many rows to show on screen.
+#   - autoWidth is FALSE which made it look a tad bit nicer.
+#   - No paging required as we can just scroll down. 
+#   - scrollY allows for vertical scrolling.
+#   - order shows to order descending on all 10 columns.
+#   - table is centered on all columns (using columnDefs).
+# Extra formatting is done using json css style option (which is annoying and
+# less clear, but no other way to do it consistently to only an indvidual object).
+# Specifically the table header background colour is adjusted, the text colour is white
+# and the text size is reduced. The text size is also reduced for the table body.
+# We do not want to show row numbers and hence rownames is set to false.
+# We can make the columnnames look a bit nicer by specifying new names.
+ 
+DT::renderDT({
+ 
+ DT::datatable(selected_data(),
+               filter = list(position = "top", plain = TRUE),
+               selection = "multiple",
+               options = list(dom = 'tif',
+                              autoWidth = FALSE,
+                              paging = FALSE,
+                              scrollY = TRUE,
+                              order = list(list(10, "desc")),
+                              columnDefs = list(list(className = "dt-center", 
+                                                     targets = "_all")),
+                              initComplete = JS(
+                                                "function(settings, json) {
+                                                    $(this.api().table().header()).css({
+                                                          'background-color': '#337ab7', 
+                                                          'color': 'white',
+                                                          'font-size': '85%'});
+                                                    $(this.api().table().body()).css({
+                                                          'font-size': '80%'});",
+                                                "}")),
+               rownames = FALSE,
+               colnames = c("ID" = "id",
+                            "Title" = "title",
+                            "User" = "user",
+                            "Domain" = "domain",
+                            "Centra" = "centra",
+                            "Department" = "department",
+                            "Status" = "status",
+                            "Template" = "template",
+                            "Completion" = "completion_cat",
+                            "Created On" = "creation_date",
+                            "Last Updated" = "last_update_date"))
+ 
+})
+
+```
