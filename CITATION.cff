@@ -18,6 +18,8 @@ authors:
   - given-names: Danny
     family-names: de Koning-van Nieuwamerongen
     orcid: 'https://orcid.org/0000-0002-8264-4541'
+repository-code: 'https://github.com/rivm-syso/dmp-dashboard'
+url: 'https://github.com/rivm-syso/dmp-dashboard'
 abstract: >-
   The DMP Dashboard is an open source tool designed to
   provide an overview and monitoring of Data Management
