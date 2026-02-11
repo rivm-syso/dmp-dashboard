@@ -1,6 +1,5 @@
 # This CITATION.cff file was generated with cffinit.
 # Visit https://bit.ly/cffinit to generate yours today!
-
 cff-version: 1.2.0
 title: DMP dashboard
 message: >-
@@ -33,3 +32,5 @@ keywords:
   - Monitoring
 license: EUPL-1.2
 version: 1.0.0
+doi: 10.21945/59d329dc-f64b-4fd7-87b2-72b06aac0d94
+date-released: 2026-02-11
