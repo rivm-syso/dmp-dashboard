@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.0.0] - 2025-0X-XX
+## [1.0.0] - 2026-02-11
 
 ### Added
 - Initial public release of the **DMP Dashboard**.
